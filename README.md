@@ -101,8 +101,14 @@ You need Node.js 20 or later, an API key from step 1, and the email of a member 
 ```bash
 git clone https://github.com/Outmarket-AI/react-sdk-example.git
 cd react-sdk-example
-cp .env.example .env   # then set OUTMARKET_API_KEY and OUTMARKET_USER_EMAIL
+cp .env.example .env   # then set OUTMARKET_API_KEY
 npm install
+```
+
+Set `SIGNED_IN_USER_EMAIL` in [`server/mint-session.js`](server/mint-session.js) to a member of your
+tenant. It stands in for the user signed in to your app. Then start the app:
+
+```bash
 npm run dev
 ```
 
@@ -114,8 +120,9 @@ is on that list. The first load in development takes a little while.
 The SDK calls Outmarket's APIs from the browser, and Outmarket only accepts those calls from origins
 it has allow-listed. localhost isn't one, so this example forwards the SDK's calls through its own
 dev server (`apiUrls` in `src/App.jsx` and the proxy in `vite.config.js`). For your production site,
-ask Outmarket to allow-list your origin (for example `https://app.example.com`) and drop `apiUrls`,
-or keep forwarding the calls through your backend.
+ask your Outmarket representative to allow-list your domain (for example `https://app.example.com`);
+approval takes 1–2 business days. Then drop `apiUrls`, or keep forwarding the calls through your
+backend.
 
 ## Notes
 
