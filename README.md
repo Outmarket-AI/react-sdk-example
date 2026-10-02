@@ -126,9 +126,8 @@ backend.
 
 ## Notes
 
-- `react` and `react-dom` are pinned to `19.2.1`: SDK version `0.1.0-alpha.0` needs exactly that
-  React version.
+- The SDK needs React 19.
 - The SDK is proprietary. Using it requires Outmarket's approval: see its license on
   [npm](https://www.npmjs.com/package/@outmarket-ai/react-sdk).
-- For the Content-Security-Policy, the PDF worker, signing out and other options, see the
+- For `onReady`, signing out and the other options, see the
   [SDK README](https://www.npmjs.com/package/@outmarket-ai/react-sdk).
