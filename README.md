@@ -115,6 +115,21 @@ npm run dev
 Open http://localhost:5173. The key's allowed IP addresses apply, so run it from a machine whose IP
 is on that list. The first load in development takes a little while.
 
+The dev server listens on localhost only, and its session route answers only this page. Don't
+expose it with `--host` or a tunnel. If the session ends (you signed out, or 30 days passed),
+restart `npm run dev` to get a new one.
+
+### Before you copy the session route
+
+The route in `vite.config.js` stands in for your backend and serves one local user. Your real route
+must:
+
+- check that the caller is signed in to your app, and refuse anyone who isn't;
+- take the email from that user's record on your server, never from the request;
+- keep one session per signed-in user, not one for the whole server;
+- answer only your own site, with `Cache-Control: no-store`;
+- keep the API key on the server: never prefix it with `VITE_`.
+
 ### Calling Outmarket from the browser
 
 The SDK calls Outmarket's APIs from the browser, and Outmarket only accepts those calls from origins
