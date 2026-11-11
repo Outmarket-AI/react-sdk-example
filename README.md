@@ -7,15 +7,16 @@ It does three things:
 
 1. **Your server** exchanges your Outmarket API key for a signed-in user's session.
 2. **Your page** passes that session to `<OutmarketProvider>`.
-3. **The SDK** renders Outmarket's workflow catalog, a workflow's form, its past runs and its
+3. **The SDK** renders Outmarket's workflow catalog, a workflow's form, past runs and their
    conversations, and the Vault.
 
-The whole integration is five files:
+The whole integration is six files:
 
 | File | What it shows |
 | --- | --- |
 | [`server/mint-session.js`](server/mint-session.js) | The server-side API call that mints the session |
 | [`src/App.jsx`](src/App.jsx) | Passing the session to the SDK and switching between its components |
+| [`src/Module.jsx`](src/Module.jsx) | A module's workflows beside the user's past runs of them |
 | [`src/Workflow.jsx`](src/Workflow.jsx) | A workflow's form beside its past runs, and the conversation a run opens |
 | [`src/Vault.jsx`](src/Vault.jsx) | The Vault beside its past chats, with its folder kept in the page's URL |
 | [`vite.config.js`](vite.config.js) | The two server routes this example needs. In your app, your backend serves them |
@@ -95,9 +96,14 @@ import '@outmarket-ai/react-sdk/styles.css';
 </OutmarketProvider>;
 ```
 
-[`src/App.jsx`](src/App.jsx) goes from the catalog to a workflow. [`src/Workflow.jsx`](src/Workflow.jsx)
-shows the workflow's form beside its past runs (`<OutmarketWorkflowHistory workflowId>`). Running the
-form, or picking a past run, opens the conversation in their place.
+[`src/App.jsx`](src/App.jsx) switches between the modules, the workflows and the Vault.
+[`src/Module.jsx`](src/Module.jsx) shows a module's catalog beside the user's past runs of its
+workflows (`<OutmarketWorkflowHistory module>`), and picking one opens its conversation in their
+place. [`src/Workflow.jsx`](src/Workflow.jsx) shows the workflow's form beside its past runs
+(`<OutmarketWorkflowHistory workflowId>`). Running the form, or picking a past run, opens the
+conversation in their place.
+
+`<OutmarketWorkflowHistory>` always takes one scope: `workflowId`, `module` or `vault`.
 
 [`src/Vault.jsx`](src/Vault.jsx) shows the Vault (`<OutmarketVault>`) beside the user's past Vault
 chats (`<OutmarketWorkflowHistory vault>`). It keeps the open folder in the page's URL, so a reload

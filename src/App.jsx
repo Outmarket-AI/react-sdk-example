@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { MODULE_TITLE, OutmarketProvider, OutmarketWorkflowsList } from '@outmarket-ai/react-sdk';
+import { MODULE_TITLE, OutmarketProvider } from '@outmarket-ai/react-sdk';
 import '@outmarket-ai/react-sdk/styles.css';
+import Module from './Module.jsx';
 import Vault from './Vault.jsx';
 import Workflow from './Workflow.jsx';
 
@@ -92,7 +93,8 @@ export default function App() {
 
       <main>
         {view.kind === 'list' && (
-          <OutmarketWorkflowsList
+          <Module
+            key={module}
             module={module}
             onSelectWorkflow={(workflowId) => setView({ kind: 'workflow', workflowId })}
           />
