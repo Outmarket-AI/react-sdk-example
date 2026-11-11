@@ -1,12 +1,7 @@
 import { useEffect, useState } from 'react';
-import {
-  MODULE_TITLE,
-  OutmarketProvider,
-  OutmarketWorkflowConversation,
-  OutmarketWorkflowForm,
-  OutmarketWorkflowsList,
-} from '@outmarket-ai/react-sdk';
+import { MODULE_TITLE, OutmarketProvider, OutmarketWorkflowsList } from '@outmarket-ai/react-sdk';
 import '@outmarket-ai/react-sdk/styles.css';
+import Workflow from './Workflow.jsx';
 
 // Which Outmarket environment the SDK talks to. Production unless you set it.
 const environment = import.meta.env.VITE_OUTMARKET_ENVIRONMENT || 'production';
@@ -66,16 +61,10 @@ export default function App() {
         {view.kind === 'list' && (
           <OutmarketWorkflowsList
             module={module}
-            onSelectWorkflow={(workflowId) => setView({ kind: 'form', workflowId })}
+            onSelectWorkflow={(workflowId) => setView({ kind: 'workflow', workflowId })}
           />
         )}
-        {view.kind === 'form' && (
-          <OutmarketWorkflowForm
-            workflowId={view.workflowId}
-            onConversationCreated={(conversationId) => setView({ kind: 'conversation', conversationId })}
-          />
-        )}
-        {view.kind === 'conversation' && <OutmarketWorkflowConversation conversationId={view.conversationId} />}
+        {view.kind === 'workflow' && <Workflow key={view.workflowId} workflowId={view.workflowId} />}
       </main>
     </OutmarketProvider>
   );

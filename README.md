@@ -7,14 +7,16 @@ It does three things:
 
 1. **Your server** exchanges your Outmarket API key for a signed-in user's session.
 2. **Your page** passes that session to `<OutmarketProvider>`.
-3. **The SDK** renders Outmarket's workflow catalog, a workflow's form and its conversation.
+3. **The SDK** renders Outmarket's workflow catalog, a workflow's form, its past runs and its
+   conversations.
 
-The whole integration is three files:
+The whole integration is four files:
 
 | File | What it shows |
 | --- | --- |
 | [`server/mint-session.js`](server/mint-session.js) | The server-side API call that mints the session |
 | [`src/App.jsx`](src/App.jsx) | Passing the session to the SDK and switching between its components |
+| [`src/Workflow.jsx`](src/Workflow.jsx) | A workflow's form beside its past runs, and the conversation a run opens |
 | [`vite.config.js`](vite.config.js) | The two server routes this example needs. In your app, your backend serves them |
 
 ## 1. Get an API key
@@ -92,7 +94,9 @@ import '@outmarket-ai/react-sdk/styles.css';
 </OutmarketProvider>;
 ```
 
-[`src/App.jsx`](src/App.jsx) goes from the catalog to a workflow's form and on to the conversation.
+[`src/App.jsx`](src/App.jsx) goes from the catalog to a workflow. [`src/Workflow.jsx`](src/Workflow.jsx)
+shows the workflow's form beside its past runs (`<OutmarketWorkflowHistory workflowId>`). Running the
+form, or picking a past run, opens the conversation in their place.
 
 ## Run this example
 
