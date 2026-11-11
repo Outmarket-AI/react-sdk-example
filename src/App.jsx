@@ -1,12 +1,8 @@
 import { useEffect, useState } from 'react';
-import {
-  MODULE_TITLE,
-  OutmarketProvider,
-  OutmarketWorkflowConversation,
-  OutmarketWorkflowForm,
-  OutmarketWorkflowsList,
-} from '@outmarket-ai/react-sdk';
+import { MODULE_TITLE, OutmarketProvider, OutmarketWorkflowsList } from '@outmarket-ai/react-sdk';
 import '@outmarket-ai/react-sdk/styles.css';
+import Vault from './Vault.jsx';
+import Workflow from './Workflow.jsx';
 
 // Which Outmarket environment the SDK talks to. Production unless you set it.
 const environment = import.meta.env.VITE_OUTMARKET_ENVIRONMENT || 'production';
@@ -20,12 +16,37 @@ const apiUrls = {
   gateway: '/outmarket/gateway/api/v1',
 };
 
+// The Vault keeps its folder in the page's URL (see Vault.jsx), so a URL with ?tab= is the Vault.
+const isVaultUrl = () => new URLSearchParams(window.location.search).has('tab');
+
 export default function App() {
   const [session, setSession] = useState(null);
   const [error, setError] = useState(null);
   const [modules, setModules] = useState([]);
   const [module, setModule] = useState('commercial_lines');
-  const [view, setView] = useState({ kind: 'list' });
+  const [hasVault, setHasVault] = useState(false);
+  const [view, setView] = useState(() => (isVaultUrl() ? { kind: 'vault' } : { kind: 'list' }));
+
+  // Back and Forward between the workflows and the Vault.
+  useEffect(() => {
+    const onPopState = () => {
+      if (isVaultUrl()) setView({ kind: 'vault' });
+      else setView((current) => (current.kind === 'vault' ? { kind: 'list' } : current));
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
+  const showModule = (m) => {
+    if (isVaultUrl()) window.history.pushState(null, '', window.location.pathname);
+    setModule(m);
+    setView({ kind: 'list' });
+  };
+
+  const showVault = () => {
+    if (!isVaultUrl()) window.history.pushState(null, '', '?tab=shared&path=');
+    setView({ kind: 'vault' });
+  };
 
   // 1. Ask your own backend for the session it minted for the signed-in user.
   useEffect(() => {
@@ -47,18 +68,25 @@ export default function App() {
       session={session}
       environment={environment}
       apiUrls={apiUrls}
-      onReady={({ workflowsByModule }) => {
+      onReady={({ workflowsByModule, features }) => {
         const available = Object.keys(workflowsByModule).filter((m) => workflowsByModule[m].length > 0);
         setModules(available);
         if (available.length > 0 && !available.includes(module)) setModule(available[0]);
+        // Offer the Vault only when the user's workspace and plan include it.
+        setHasVault(features.vault);
       }}
     >
       <header>
         {modules.map((m) => (
-          <button key={m} disabled={m === module && view.kind === 'list'} onClick={() => { setModule(m); setView({ kind: 'list' }); }}>
+          <button key={m} disabled={m === module && view.kind === 'list'} onClick={() => showModule(m)}>
             {MODULE_TITLE[m]}
           </button>
         ))}
+        {hasVault && (
+          <button disabled={view.kind === 'vault'} onClick={showVault}>
+            Vault
+          </button>
+        )}
         <span style={{ marginLeft: 'auto' }}>{session.user.email} · {session.instance.name}</span>
       </header>
 
@@ -66,16 +94,11 @@ export default function App() {
         {view.kind === 'list' && (
           <OutmarketWorkflowsList
             module={module}
-            onSelectWorkflow={(workflowId) => setView({ kind: 'form', workflowId })}
+            onSelectWorkflow={(workflowId) => setView({ kind: 'workflow', workflowId })}
           />
         )}
-        {view.kind === 'form' && (
-          <OutmarketWorkflowForm
-            workflowId={view.workflowId}
-            onConversationCreated={(conversationId) => setView({ kind: 'conversation', conversationId })}
-          />
-        )}
-        {view.kind === 'conversation' && <OutmarketWorkflowConversation conversationId={view.conversationId} />}
+        {view.kind === 'workflow' && <Workflow key={view.workflowId} workflowId={view.workflowId} />}
+        {view.kind === 'vault' && <Vault />}
       </main>
     </OutmarketProvider>
   );

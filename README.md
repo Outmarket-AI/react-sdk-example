@@ -1,20 +1,23 @@
 # Outmarket React SDK example
 
-A minimal React app that embeds Outmarket workflows with
+A minimal React app that embeds Outmarket workflows and the Vault with
 [`@outmarket-ai/react-sdk`](https://www.npmjs.com/package/@outmarket-ai/react-sdk).
 
 It does three things:
 
 1. **Your server** exchanges your Outmarket API key for a signed-in user's session.
 2. **Your page** passes that session to `<OutmarketProvider>`.
-3. **The SDK** renders Outmarket's workflow catalog, a workflow's form and its conversation.
+3. **The SDK** renders Outmarket's workflow catalog, a workflow's form, its past runs and its
+   conversations, and the Vault.
 
-The whole integration is three files:
+The whole integration is five files:
 
 | File | What it shows |
 | --- | --- |
 | [`server/mint-session.js`](server/mint-session.js) | The server-side API call that mints the session |
 | [`src/App.jsx`](src/App.jsx) | Passing the session to the SDK and switching between its components |
+| [`src/Workflow.jsx`](src/Workflow.jsx) | A workflow's form beside its past runs, and the conversation a run opens |
+| [`src/Vault.jsx`](src/Vault.jsx) | The Vault beside its past chats, with its folder kept in the page's URL |
 | [`vite.config.js`](vite.config.js) | The two server routes this example needs. In your app, your backend serves them |
 
 ## 1. Get an API key
@@ -92,7 +95,15 @@ import '@outmarket-ai/react-sdk/styles.css';
 </OutmarketProvider>;
 ```
 
-[`src/App.jsx`](src/App.jsx) goes from the catalog to a workflow's form and on to the conversation.
+[`src/App.jsx`](src/App.jsx) goes from the catalog to a workflow. [`src/Workflow.jsx`](src/Workflow.jsx)
+shows the workflow's form beside its past runs (`<OutmarketWorkflowHistory workflowId>`). Running the
+form, or picking a past run, opens the conversation in their place.
+
+[`src/Vault.jsx`](src/Vault.jsx) shows the Vault (`<OutmarketVault>`) beside the user's past Vault
+chats (`<OutmarketWorkflowHistory vault>`). It keeps the open folder in the page's URL, so a reload
+reopens it and the browser's Back button walks back through folders. Starting a chat, or picking a
+past one, opens it in their place. The header offers the Vault only when `onReady` reports
+`features.vault`.
 
 ## Run this example
 
