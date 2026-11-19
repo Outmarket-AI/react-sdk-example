@@ -19,7 +19,7 @@ The whole integration is seven files:
 | [`src/Module.jsx`](src/Module.jsx) | A module's workflows beside the user's past runs of them |
 | [`src/Workflow.jsx`](src/Workflow.jsx) | A workflow's form beside its past runs, and the conversation a run opens |
 | [`src/Vault.jsx`](src/Vault.jsx) | The Vault beside its past chats, with its folder kept in the page's URL |
-| [`src/EndorsementCheck.jsx`](src/EndorsementCheck.jsx) | The Endorsement Check, with the open check kept in the page's URL |
+| [`src/EndorsementCheck.jsx`](src/EndorsementCheck.jsx) | The Endorsement Check beside its past checks, with the open check kept in the page's URL |
 | [`vite.config.js`](vite.config.js) | The two server routes this example needs. In your app, your backend serves them |
 
 ## 1. Get an API key
@@ -104,7 +104,7 @@ place. [`src/Workflow.jsx`](src/Workflow.jsx) shows the workflow's form beside i
 (`<OutmarketWorkflowHistory workflowId>`). Running the form, or picking a past run, opens the
 conversation in their place.
 
-`<OutmarketWorkflowHistory>` always takes one scope: `workflowId`, `module` or `vault`.
+`<OutmarketWorkflowHistory>` always takes one scope: `workflowId`, `module`, `vault` or `endorsementCheck`.
 
 [`src/Vault.jsx`](src/Vault.jsx) shows the Vault (`<OutmarketVault>`) beside the user's past Vault
 chats (`<OutmarketWorkflowHistory vault>`). It keeps the open folder in the page's URL, so a reload
@@ -113,8 +113,9 @@ past one, opens it in their place. The header offers the Vault only when `onRead
 `features.vault`.
 
 [`src/EndorsementCheck.jsx`](src/EndorsementCheck.jsx) shows the Endorsement Check
-(`<OutmarketEndorsementCheck>`): the intake beside the user's past checks, and each check's report and
-rounds. It keeps the open check in the page's URL (`?check=<id>`), so a reload reopens it and the
+(`<OutmarketEndorsementCheck>`): the intake, and each check's report and rounds, beside the user's past
+checks (`<OutmarketWorkflowHistory endorsementCheck>`). Picking a past check opens it in the
+Endorsement Check. It keeps the open check in the page's URL (`?check=<id>`), so a reload reopens it and the
 browser's Back button returns to the intake, and its Cancel goes back to the workflows. The header
 offers it only when `onReady` reports `features.endorsementCheck`. It needs your workspace's Applied
 Epic connection.
