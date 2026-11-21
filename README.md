@@ -1,6 +1,6 @@
 # Outmarket React SDK example
 
-A minimal React app that embeds Outmarket workflows, the Vault and the Endorsement Check with
+A minimal React app that embeds Outmarket workflows, the Vault, the Endorsement Check and the Assistant with
 [`@outmarket-ai/react-sdk`](https://www.npmjs.com/package/@outmarket-ai/react-sdk).
 
 It does three things:
@@ -8,9 +8,9 @@ It does three things:
 1. **Your server** exchanges your Outmarket API key for a signed-in user's session.
 2. **Your page** passes that session to `<OutmarketProvider>`.
 3. **The SDK** renders Outmarket's workflow catalog, a workflow's form, past runs and their
-   conversations, the Vault and the Endorsement Check.
+   conversations, the Vault, the Endorsement Check and the Assistant.
 
-The whole integration is seven files:
+The whole integration is eight files:
 
 | File | What it shows |
 | --- | --- |
@@ -20,6 +20,7 @@ The whole integration is seven files:
 | [`src/Workflow.jsx`](src/Workflow.jsx) | A workflow's form beside its past runs, and the conversation a run opens |
 | [`src/Vault.jsx`](src/Vault.jsx) | The Vault beside its past chats, with its folder kept in the page's URL |
 | [`src/EndorsementCheck.jsx`](src/EndorsementCheck.jsx) | The Endorsement Check beside its past checks, with the open check kept in the page's URL |
+| [`src/Assistant.jsx`](src/Assistant.jsx) | The Assistant beside its past chats, with the open chat kept in the page's URL |
 | [`vite.config.js`](vite.config.js) | The two server routes this example needs. In your app, your backend serves them |
 
 ## 1. Get an API key
@@ -97,14 +98,16 @@ import '@outmarket-ai/react-sdk/styles.css';
 </OutmarketProvider>;
 ```
 
-[`src/App.jsx`](src/App.jsx) switches between the modules, the workflows and the Vault.
+[`src/App.jsx`](src/App.jsx) switches between the modules, the workflows, the Vault, the Endorsement Check
+and the Assistant.
 [`src/Module.jsx`](src/Module.jsx) shows a module's catalog beside the user's past runs of its
 workflows (`<OutmarketWorkflowHistory module>`), and picking one opens its conversation in their
 place. [`src/Workflow.jsx`](src/Workflow.jsx) shows the workflow's form beside its past runs
 (`<OutmarketWorkflowHistory workflowId>`). Running the form, or picking a past run, opens the
 conversation in their place.
 
-`<OutmarketWorkflowHistory>` always takes one scope: `workflowId`, `module`, `vault` or `endorsementCheck`.
+`<OutmarketWorkflowHistory>` always takes one scope: `workflowId`, `module`, `vault`, `endorsementCheck` or
+`assistant`.
 
 [`src/Vault.jsx`](src/Vault.jsx) shows the Vault (`<OutmarketVault>`) beside the user's past Vault
 chats (`<OutmarketWorkflowHistory vault>`). It keeps the open folder in the page's URL, so a reload
@@ -119,6 +122,12 @@ Endorsement Check. It keeps the open check in the page's URL (`?check=<id>`), so
 browser's Back button returns to the intake, and its Cancel goes back to the workflows. The header
 offers it only when `onReady` reports `features.endorsementCheck`. It needs your workspace's Applied
 Epic connection.
+
+[`src/Assistant.jsx`](src/Assistant.jsx) shows the Assistant (`<OutmarketAssistant>`): a new chat, and
+each chat with its answers and artifacts, beside the user's past chats (`<OutmarketWorkflowHistory assistant>`).
+Picking a past chat opens it in the Assistant. It keeps the open chat in the page's URL (`?chat=<id>`), so a
+reload reopens it and the browser's Back button returns to the chat before; the "Assistant" crumb above it
+starts a new chat. The header offers it only when `onReady` reports `features.assistant`.
 
 ## Run this example
 

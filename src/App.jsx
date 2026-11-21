@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { MODULE_TITLE, OutmarketProvider } from '@outmarket-ai/react-sdk';
 import '@outmarket-ai/react-sdk/styles.css';
+import Assistant from './Assistant.jsx';
 import EndorsementCheck from './EndorsementCheck.jsx';
 import Module from './Module.jsx';
 import Vault from './Vault.jsx';
@@ -22,10 +23,15 @@ const apiUrls = {
 const isVaultUrl = () => new URLSearchParams(window.location.search).has('tab');
 // The Endorsement Check keeps its open check there too (see EndorsementCheck.jsx): ?check= is the Endorsement Check.
 const isEndorsementCheckUrl = () => new URLSearchParams(window.location.search).has('check');
+// The Assistant keeps its open chat there too (see Assistant.jsx): ?chat= is the Assistant.
+const isAssistantUrl = () => new URLSearchParams(window.location.search).has('chat');
+// The views that keep their place in the URL: Back to an entry without one returns to the workflows.
+const URL_VIEWS = ['vault', 'endorsement_check', 'assistant'];
 
 function viewFromUrl() {
   if (isVaultUrl()) return { kind: 'vault' };
   if (isEndorsementCheckUrl()) return { kind: 'endorsement_check' };
+  if (isAssistantUrl()) return { kind: 'assistant' };
   return { kind: 'list' };
 }
 
@@ -36,21 +42,24 @@ export default function App() {
   const [module, setModule] = useState('commercial_lines');
   const [hasVault, setHasVault] = useState(false);
   const [hasEndorsementCheck, setHasEndorsementCheck] = useState(false);
+  const [hasAssistant, setHasAssistant] = useState(false);
   const [view, setView] = useState(viewFromUrl);
 
-  // Back and Forward between the workflows, the Vault and the Endorsement Check.
+  // Back and Forward between the workflows, the Vault, the Endorsement Check and the Assistant.
   useEffect(() => {
     const onPopState = () => {
       const next = viewFromUrl();
       if (next.kind !== 'list') setView(next);
-      else setView((current) => (current.kind === 'vault' || current.kind === 'endorsement_check' ? next : current));
+      else setView((current) => (URL_VIEWS.includes(current.kind) ? next : current));
     };
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
 
   const showModule = (m) => {
-    if (isVaultUrl() || isEndorsementCheckUrl()) window.history.pushState(null, '', window.location.pathname);
+    if (isVaultUrl() || isEndorsementCheckUrl() || isAssistantUrl()) {
+      window.history.pushState(null, '', window.location.pathname);
+    }
     setModule(m);
     setView({ kind: 'list' });
   };
@@ -63,6 +72,11 @@ export default function App() {
   const showEndorsementCheck = () => {
     if (!isEndorsementCheckUrl()) window.history.pushState(null, '', '?check=');
     setView({ kind: 'endorsement_check' });
+  };
+
+  const showAssistant = () => {
+    if (!isAssistantUrl()) window.history.pushState(null, '', '?chat=');
+    setView({ kind: 'assistant' });
   };
 
   // 1. Ask your own backend for the session it minted for the signed-in user.
@@ -89,9 +103,11 @@ export default function App() {
         const available = Object.keys(workflowsByModule).filter((m) => workflowsByModule[m].length > 0);
         setModules(available);
         if (available.length > 0 && !available.includes(module)) setModule(available[0]);
-        // Offer the Vault and the Endorsement Check only when the user's workspace and plan include them.
+        // Offer the Vault, the Endorsement Check and the Assistant only when the user's workspace and plan
+        // include them.
         setHasVault(features.vault);
         setHasEndorsementCheck(features.endorsementCheck);
+        setHasAssistant(features.assistant);
       }}
     >
       <header>
@@ -110,6 +126,11 @@ export default function App() {
             Endorsement Check
           </button>
         )}
+        {hasAssistant && (
+          <button disabled={view.kind === 'assistant'} onClick={showAssistant}>
+            Assistant
+          </button>
+        )}
         <span style={{ marginLeft: 'auto' }}>{session.user.email} · {session.instance.name}</span>
       </header>
 
@@ -124,6 +145,7 @@ export default function App() {
         {view.kind === 'workflow' && <Workflow key={view.workflowId} workflowId={view.workflowId} />}
         {view.kind === 'vault' && <Vault />}
         {view.kind === 'endorsement_check' && <EndorsementCheck onCancel={() => showModule(module)} />}
+        {view.kind === 'assistant' && <Assistant />}
       </main>
     </OutmarketProvider>
   );
